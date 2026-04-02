@@ -542,7 +542,7 @@ document.addEventListener("DOMContentLoaded", function () {
                   line.parentElement.style.paddingBottom = "0.2em";
                 }
               });
-              gsap.set(self.lines, { y: "120%" });
+              gsap.set(self.lines, { y: "130%" });
               gsap.set(heading, { autoAlpha: 1 });
               self.lines.forEach(function (line, i) {
                 tl.to(line, {
