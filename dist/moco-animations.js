@@ -498,17 +498,12 @@ document.addEventListener("DOMContentLoaded", function () {
         // ── Build timeline ──
         var tl = gsap.timeline({ delay: 0.1 });
 
-        // Image: clip-path wipe from left to right + cinematic scale settle
+        // Image: clip-path wipe from left to right (time-based only, no scale here)
         if (image) {
           tl.to(image, {
             clipPath: "inset(0 0% 0 0)",
             duration: isDesktop ? 1.2 : 0.8,
             ease: "power2.inOut",
-          }, 0);
-          tl.to(image, {
-            scale: 1,
-            duration: isDesktop ? 3 : 2,
-            ease: "power1.out",
           }, 0);
         }
 
@@ -579,19 +574,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // ── Post-load: scroll-driven shrink from full-bleed to natural width ──
         if (image) {
-          gsap.to(image, {
-            width: imageNaturalWidth,
-            marginLeft: 0,
-            scale: 1,
-            ease: "none",
-            scrollTrigger: {
-              trigger: section,
-              start: "top top",
-              end: isDesktop ? "+=50%" : "+=35%",
-              scrub: 1,
-              invalidateOnRefresh: true,
+          gsap.fromTo(image,
+            {
+              width: "100vw",
+              marginLeft: "calc(-50vw + 50%)",
+              scale: isDesktop ? 1.05 : 1.02,
             },
-          });
+            {
+              width: imageNaturalWidth,
+              marginLeft: 0,
+              scale: 1,
+              ease: "none",
+              scrollTrigger: {
+                trigger: section,
+                start: "top top",
+                end: isDesktop ? "+=50%" : "+=35%",
+                scrub: 1,
+                invalidateOnRefresh: true,
+              },
+            }
+          );
         }
       });
 
