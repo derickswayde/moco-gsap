@@ -474,8 +474,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // ── Set initial states ──
         if (heading) gsap.set(heading, { autoAlpha: 1 });
         if (paragraph) {
-          gsap.set(paragraph, { clipPath: "inset(0 0 0 0)", autoAlpha: 1 });
-          gsap.set(paragraph.children, { yPercent: 110, autoAlpha: 1 });
+          gsap.set(paragraph, { autoAlpha: 0, y: isDesktop ? 30 : 15 });
         }
         if (image) gsap.set(image, {
           clipPath: "inset(0 100% 0 0)",
@@ -540,6 +539,11 @@ document.addEventListener("DOMContentLoaded", function () {
             mask: "lines",
             autoSplit: true,
             onSplit: function (self) {
+              // Add padding to mask wrappers to prevent descender clipping (p, y, g, etc.)
+              var maskWrappers = heading.querySelectorAll(".split-line-mask");
+              if (maskWrappers.length) {
+                gsap.set(maskWrappers, { paddingBottom: "0.15em" });
+              }
               gsap.set(self.lines, { y: "100%" });
               gsap.set(heading, { autoAlpha: 1 });
               self.lines.forEach(function (line, i) {
@@ -553,33 +557,16 @@ document.addEventListener("DOMContentLoaded", function () {
           });
         }
 
-        // Paragraph: mask-up with staggered children + scramble
+        // Paragraph: simple fade in with slight rise
         if (paragraph) {
-          var paraChildren = Array.prototype.slice.call(paragraph.children);
-          paraChildren.forEach(function (child, index) {
-            var paraStart = isDesktop ? 0.9 : 0.6;
-            tl.to(child, {
-              yPercent: 0,
-              duration: isDesktop ? 0.7 : 0.45,
-              ease: "power3.out",
-            }, paraStart + (index * (isDesktop ? 0.12 : 0.08)));
-
-            if (child.hasAttribute("data-gsap-scramble")) {
-              var textTarget = child.querySelector("p, span, h1, h2, h3, h4, h5, h6") || child;
-              var finalText = textTarget.textContent;
-              var chars = child.getAttribute("data-gsap-scramble") || child.getAttribute("data-gsap-chars") || "upperCase";
-              if (chars === "") chars = "upperCase";
-              tl.to(textTarget, {
-                duration: isDesktop ? 2 : 1,
-                scrambleText: {
-                  text: finalText,
-                  chars: chars,
-                  revealDelay: 0.4,
-                  speed: 0.4,
-                },
-              }, paraStart + 0.05 + (index * (isDesktop ? 0.12 : 0.08)));
-            }
-          });
+          gsap.set(paragraph, { autoAlpha: 0, y: isDesktop ? 30 : 15 });
+          var paraStart = isDesktop ? 0.9 : 0.6;
+          tl.to(paragraph, {
+            autoAlpha: 1,
+            y: 0,
+            duration: isDesktop ? 1 : 0.6,
+            ease: "power2.out",
+          }, paraStart);
         }
 
         // ── Post-load: image parallax on scroll ──
