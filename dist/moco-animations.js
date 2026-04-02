@@ -477,16 +477,13 @@ document.addEventListener("DOMContentLoaded", function () {
           gsap.set(paragraph, { autoAlpha: 0, y: isDesktop ? 30 : 15 });
         }
         // Save image natural dimensions before expanding to full-bleed
-        var imageNaturalWidth, imageNaturalLeft, imageNaturalRadius;
+        var imageNaturalWidth;
         if (image) {
           imageNaturalWidth = image.offsetWidth;
-          imageNaturalLeft = image.getBoundingClientRect().left;
-          imageNaturalRadius = getComputedStyle(image).borderRadius || "0px";
 
           gsap.set(image, {
             width: "100vw",
             marginLeft: "calc(-50vw + 50%)",
-            borderRadius: "0px",
             clipPath: "inset(0 100% 0 0)",
             scale: isDesktop ? 1.05 : 1.02,
             autoAlpha: 1,
@@ -585,7 +582,6 @@ document.addEventListener("DOMContentLoaded", function () {
           gsap.to(image, {
             width: imageNaturalWidth,
             marginLeft: 0,
-            borderRadius: imageNaturalRadius,
             scale: 1,
             ease: "none",
             scrollTrigger: {
