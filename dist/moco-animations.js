@@ -371,41 +371,37 @@ document.addEventListener("DOMContentLoaded", function () {
         var children = Array.prototype.slice.call(parent.children);
         if (!children.length) return;
 
-        var customStagger = parseFloat(parent.getAttribute("data-gsap-stagger") || "0");
+        var staggerVal = parseFloat(parent.getAttribute("data-gsap-stagger") || "0") || (isDesktop ? 0.12 : 0.08);
 
-        // Apply mask
-        parent.style.overflow = "hidden";
-
-        // Set children to hidden state below the mask
-        gsap.set(children, { y: "110%", autoAlpha: 1 });
-        gsap.set(parent, { autoAlpha: 1 });
+        // clipPath masks reliably on any display type (inline-flex, flex, etc.)
+        gsap.set(parent, { clipPath: "inset(0 0 0 0)", autoAlpha: 1 });
+        gsap.set(children, { yPercent: 110, autoAlpha: 1 });
 
         ScrollTrigger.create({
           trigger: parent,
           start: isDesktop ? "top 85%" : "top 90%",
           once: true,
           onEnter: function () {
-            // Stagger children up
-            gsap.to(children, {
-              y: "0%",
-              duration: isDesktop ? 0.8 : 0.5,
-              stagger: customStagger || (isDesktop ? 0.12 : 0.08),
-              ease: "power3.out",
-              overwrite: true,
-            });
-
-            // Find any children with data-gsap-scramble and trigger scramble
+            // Stagger children up into view
             children.forEach(function (child, index) {
+              var delay = staggerVal * index;
+
+              gsap.to(child, {
+                yPercent: 0,
+                duration: isDesktop ? 0.7 : 0.45,
+                delay: delay,
+                ease: "power3.out",
+              });
+
+              // If child has data-gsap-scramble, trigger scramble after it starts rising
               if (child.hasAttribute("data-gsap-scramble")) {
                 var textTarget = child.querySelector("p, span, h1, h2, h3, h4, h5, h6") || child;
                 var finalText = textTarget.textContent;
                 var chars = child.getAttribute("data-gsap-scramble") || child.getAttribute("data-gsap-chars") || "upperCase";
-                // Clear text before reveal, scramble fills it in
-                textTarget.textContent = "";
-                // Delay scramble to sync with stagger position
-                var scrambleDelay = (customStagger || (isDesktop ? 0.12 : 0.08)) * index;
+                if (chars === "") chars = "upperCase";
+
                 gsap.to(textTarget, {
-                  delay: scrambleDelay,
+                  delay: delay + 0.05,
                   duration: isDesktop ? 2 : 1,
                   scrambleText: {
                     text: finalText,
