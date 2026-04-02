@@ -205,7 +205,7 @@ document.addEventListener("DOMContentLoaded", function () {
           var eyebrow = section.querySelector('[data-gsap-role="hero-eyebrow"]');
           if (heading) gsap.set(heading, { autoAlpha: 1 });
           if (paragraph) { gsap.set(paragraph, { autoAlpha: 1 }); gsap.set(paragraph.children, { autoAlpha: 1, y: 0 }); }
-          if (image) gsap.set(image, { autoAlpha: 1, clipPath: "inset(0 0% 0 0)", scale: 1 });
+          if (image) gsap.set(image, { autoAlpha: 1, clipPath: "inset(0 0% 0 0)" });
           if (eyebrow) { gsap.set(eyebrow, { autoAlpha: 1 }); gsap.set(eyebrow.children, { autoAlpha: 1, y: 0 }); }
         });
         // Scenes: show final state
@@ -476,19 +476,11 @@ document.addEventListener("DOMContentLoaded", function () {
         if (paragraph) {
           gsap.set(paragraph, { autoAlpha: 0, y: isDesktop ? 30 : 15 });
         }
-        // Save image natural dimensions before expanding to full-bleed
-        var imageNaturalWidth, imageOffsetX;
+        // Image starts at natural grid size, wipes in, then grows to full-bleed on scroll
         if (image) {
-          imageNaturalWidth = image.offsetWidth;
-          imageOffsetX = -image.getBoundingClientRect().left;
-
           gsap.set(image, {
-            width: window.innerWidth,
-            x: imageOffsetX,
             clipPath: "inset(0 100% 0 0)",
-            scale: isDesktop ? 1.05 : 1.02,
             autoAlpha: 1,
-            transformOrigin: "center center",
           });
         }
         if (eyebrow) {
@@ -573,28 +565,21 @@ document.addEventListener("DOMContentLoaded", function () {
           }, paraStart);
         }
 
-        // ── Post-load: scroll-driven shrink from full-bleed to natural width ──
+        // ── Post-load: scroll-driven grow from grid size to full viewport width ──
         if (image) {
-          gsap.fromTo(image,
-            {
-              width: window.innerWidth,
-              x: imageOffsetX,
-              scale: isDesktop ? 1.05 : 1.02,
+          var imageOffsetX = -image.getBoundingClientRect().left;
+          gsap.to(image, {
+            width: window.innerWidth,
+            x: imageOffsetX,
+            ease: "none",
+            scrollTrigger: {
+              trigger: section,
+              start: "top top",
+              end: isDesktop ? "+=50%" : "+=35%",
+              scrub: 1,
+              invalidateOnRefresh: true,
             },
-            {
-              width: imageNaturalWidth,
-              x: 0,
-              scale: 1,
-              ease: "none",
-              scrollTrigger: {
-                trigger: section,
-                start: "top top",
-                end: isDesktop ? "+=50%" : "+=35%",
-                scrub: 1,
-                invalidateOnRefresh: true,
-              },
-            }
-          );
+          });
         }
       });
 
