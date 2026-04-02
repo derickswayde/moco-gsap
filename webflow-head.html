@@ -10,7 +10,19 @@
   [data-gsap="hero-chars"],
   [data-gsap="hero-lines"],
   [data-gsap="hero-words"],
+  [data-gsap="mask-up"],
+  [data-gsap="mask-up"] > *,
   [data-gsap="stagger-up"] > * {
     visibility: hidden;
+  }
+
+  /* Fallback: reveal all if JS fails to load within 3s */
+  @keyframes gsap-fallback {
+    to { visibility: visible; }
+  }
+  [data-gsap],
+  [data-gsap="mask-up"] > *,
+  [data-gsap="stagger-up"] > * {
+    animation: gsap-fallback 0s 3s forwards;
   }
 </style>

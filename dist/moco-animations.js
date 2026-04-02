@@ -12,6 +12,7 @@
  *   "slide-left"      — Slide in from right on scroll enter
  *   "text-fade"       — Opacity fade on scroll enter
  *   "stagger-up"      — Stagger children upward on scroll (set on PARENT)
+ *   "mask-up"         — Masked stagger reveal with optional scramble (set on PARENT)
  *   "scramble"        — Scramble text on scroll enter
  *   "hero-lines"      — SplitText line-by-line mask reveal (page load)
  *   "hero-chars"      — SplitText character stagger reveal (page load)
@@ -191,6 +192,10 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll('[data-gsap="stagger-up"]').forEach(function (parent) {
           gsap.set(parent.children, { autoAlpha: 1, y: 0 });
         });
+        document.querySelectorAll('[data-gsap="mask-up"]').forEach(function (parent) {
+          gsap.set(parent, { autoAlpha: 1 });
+          gsap.set(parent.children, { autoAlpha: 1, y: 0 });
+        });
         // Scenes: show final state
         document.querySelectorAll('[data-gsap-scene="image-reveal"]').forEach(function (section) {
           var img = section.querySelector('[data-gsap-role="image"]');
@@ -354,6 +359,62 @@ document.addEventListener("DOMContentLoaded", function () {
                 revealDelay: 0.3,
                 speed: 0.5,
               },
+            });
+          },
+        });
+      });
+
+      // ── Mask Up (masked stagger reveal with optional scramble on children) ──
+      // Set on parent. Children rise up from behind a clip mask, staggered.
+      // Add data-gsap-scramble (optionally with chars value) on any child to scramble its text.
+      document.querySelectorAll('[data-gsap="mask-up"]').forEach(function (parent) {
+        var children = Array.prototype.slice.call(parent.children);
+        if (!children.length) return;
+
+        var customStagger = parseFloat(parent.getAttribute("data-gsap-stagger") || "0");
+
+        // Apply mask
+        parent.style.overflow = "hidden";
+
+        // Set children to hidden state below the mask
+        gsap.set(children, { y: "110%", autoAlpha: 1 });
+        gsap.set(parent, { autoAlpha: 1 });
+
+        ScrollTrigger.create({
+          trigger: parent,
+          start: isDesktop ? "top 85%" : "top 90%",
+          once: true,
+          onEnter: function () {
+            // Stagger children up
+            gsap.to(children, {
+              y: "0%",
+              duration: isDesktop ? 0.8 : 0.5,
+              stagger: customStagger || (isDesktop ? 0.12 : 0.08),
+              ease: "power3.out",
+              overwrite: true,
+            });
+
+            // Find any children with data-gsap-scramble and trigger scramble
+            children.forEach(function (child, index) {
+              if (child.hasAttribute("data-gsap-scramble")) {
+                var textTarget = child.querySelector("p, span, h1, h2, h3, h4, h5, h6") || child;
+                var finalText = textTarget.textContent;
+                var chars = child.getAttribute("data-gsap-scramble") || child.getAttribute("data-gsap-chars") || "upperCase";
+                // Clear text before reveal, scramble fills it in
+                textTarget.textContent = "";
+                // Delay scramble to sync with stagger position
+                var scrambleDelay = (customStagger || (isDesktop ? 0.12 : 0.08)) * index;
+                gsap.to(textTarget, {
+                  delay: scrambleDelay,
+                  duration: isDesktop ? 2 : 1,
+                  scrambleText: {
+                    text: finalText,
+                    chars: chars,
+                    revealDelay: 0.4,
+                    speed: 0.4,
+                  },
+                });
+              }
             });
           },
         });
