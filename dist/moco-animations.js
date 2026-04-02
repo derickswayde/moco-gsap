@@ -334,8 +334,10 @@ document.addEventListener("DOMContentLoaded", function () {
       });
 
       // ── Scramble (utility level) ──
+      // Targets inner text element if inside a rich text wrapper (preserves <p> tags)
       document.querySelectorAll('[data-gsap="scramble"]').forEach(function (el) {
-        var finalText = el.textContent;
+        var textTarget = el.querySelector("p, span, h1, h2, h3, h4, h5, h6") || el;
+        var finalText = textTarget.textContent;
         var chars = el.getAttribute("data-gsap-chars") || "upperCase";
 
         gsap.set(el, { autoAlpha: 1 });
@@ -344,7 +346,7 @@ document.addEventListener("DOMContentLoaded", function () {
           start: isDesktop ? "top 85%" : "top 90%",
           once: true,
           onEnter: function () {
-            gsap.to(el, {
+            gsap.to(textTarget, {
               duration: isDesktop ? 1.5 : 0.8,
               scrambleText: {
                 text: finalText,
