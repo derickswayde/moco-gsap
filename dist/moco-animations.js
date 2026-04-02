@@ -19,6 +19,7 @@
  *   "hero-words"      — SplitText word-by-word mask reveal (page load)
  *
  * ── SCENES (data-gsap-scene) ───────────────────────
+ *   "hero"            — Premium hero: clip-path image wipe, heading line reveal, paragraph mask-up scramble, parallax
  *   "image-reveal"    — Pinned image scale-to-fullscreen
  *   "svg-draw"        — SVG stroke draw on scroll
  *   "horizontal-scroll" — Horizontal scroll section (desktop only)
@@ -195,6 +196,17 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll('[data-gsap="mask-up"]').forEach(function (parent) {
           gsap.set(parent, { autoAlpha: 1 });
           gsap.set(parent.children, { autoAlpha: 1, y: 0 });
+        });
+        // Hero scene: show final state
+        document.querySelectorAll('[data-gsap-scene="hero"]').forEach(function (section) {
+          var heading = section.querySelector('[data-gsap-role="hero-heading"]');
+          var paragraph = section.querySelector('[data-gsap-role="hero-paragraph"]');
+          var image = section.querySelector('[data-gsap-role="hero-image"]');
+          var eyebrow = section.querySelector('[data-gsap-role="hero-eyebrow"]');
+          if (heading) gsap.set(heading, { autoAlpha: 1 });
+          if (paragraph) { gsap.set(paragraph, { autoAlpha: 1 }); gsap.set(paragraph.children, { autoAlpha: 1, y: 0 }); }
+          if (image) gsap.set(image, { autoAlpha: 1, clipPath: "inset(0 0% 0 0)", scale: 1 });
+          if (eyebrow) { gsap.set(eyebrow, { autoAlpha: 1 }); gsap.set(eyebrow.children, { autoAlpha: 1, y: 0 }); }
         });
         // Scenes: show final state
         document.querySelectorAll('[data-gsap-scene="image-reveal"]').forEach(function (section) {
@@ -444,6 +456,145 @@ document.addEventListener("DOMContentLoaded", function () {
       // ════════════════════════════════════════════
       //  SCENES
       // ════════════════════════════════════════════
+
+      // ── 0. Hero Scene ──
+      // Premium page-load hero animation with staggered timeline.
+      // Set data-gsap-scene="hero" on the hero section wrapper.
+      // Roles:
+      //   data-gsap-role="hero-heading"   — the heading element (SplitText line reveal)
+      //   data-gsap-role="hero-paragraph" — the styled paragraph parent (mask-up + scramble)
+      //   data-gsap-role="hero-image"     — the image/visual element (clip-path wipe + scale settle)
+      //   data-gsap-role="hero-eyebrow"   — optional eyebrow (mask-up)
+      document.querySelectorAll('[data-gsap-scene="hero"]').forEach(function (section) {
+        var heading = section.querySelector('[data-gsap-role="hero-heading"]');
+        var paragraph = section.querySelector('[data-gsap-role="hero-paragraph"]');
+        var image = section.querySelector('[data-gsap-role="hero-image"]');
+        var eyebrow = section.querySelector('[data-gsap-role="hero-eyebrow"]');
+
+        // ── Set initial states ──
+        if (heading) gsap.set(heading, { autoAlpha: 1 });
+        if (paragraph) {
+          gsap.set(paragraph, { clipPath: "inset(0 0 0 0)", autoAlpha: 1 });
+          gsap.set(paragraph.children, { yPercent: 110, autoAlpha: 1 });
+        }
+        if (image) gsap.set(image, {
+          clipPath: "inset(0 100% 0 0)",
+          scale: isDesktop ? 1.08 : 1.04,
+          autoAlpha: 1,
+          transformOrigin: "center center",
+        });
+        if (eyebrow) {
+          gsap.set(eyebrow, { clipPath: "inset(0 0 0 0)", autoAlpha: 1 });
+          gsap.set(eyebrow.children, { yPercent: 110, autoAlpha: 1 });
+        }
+
+        // ── Build timeline ──
+        var tl = gsap.timeline({ delay: 0.1 });
+
+        // Image: clip-path wipe from left to right + cinematic scale settle
+        if (image) {
+          tl.to(image, {
+            clipPath: "inset(0 0% 0 0)",
+            duration: isDesktop ? 1.2 : 0.8,
+            ease: "power2.inOut",
+          }, 0);
+          tl.to(image, {
+            scale: 1,
+            duration: isDesktop ? 3 : 2,
+            ease: "power1.out",
+          }, 0);
+        }
+
+        // Eyebrow: mask-up stagger (if present)
+        if (eyebrow) {
+          var eyebrowChildren = Array.prototype.slice.call(eyebrow.children);
+          eyebrowChildren.forEach(function (child, index) {
+            tl.to(child, {
+              yPercent: 0,
+              duration: isDesktop ? 0.7 : 0.45,
+              ease: "power3.out",
+            }, isDesktop ? 0.2 + (index * 0.1) : 0.15 + (index * 0.08));
+
+            if (child.hasAttribute("data-gsap-scramble")) {
+              var textTarget = child.querySelector("p, span, h1, h2, h3, h4, h5, h6") || child;
+              var finalText = textTarget.textContent;
+              var chars = child.getAttribute("data-gsap-scramble") || child.getAttribute("data-gsap-chars") || "upperCase";
+              if (chars === "") chars = "upperCase";
+              tl.to(textTarget, {
+                duration: isDesktop ? 2 : 1,
+                scrambleText: {
+                  text: finalText,
+                  chars: chars,
+                  revealDelay: 0.4,
+                  speed: 0.4,
+                },
+              }, isDesktop ? 0.25 + (index * 0.1) : 0.2 + (index * 0.08));
+            }
+          });
+        }
+
+        // Heading: SplitText line-by-line mask reveal
+        if (heading) {
+          SplitText.create(heading, {
+            type: "lines",
+            mask: "lines",
+            autoSplit: true,
+            onSplit: function (self) {
+              gsap.set(self.lines, { y: "100%" });
+              gsap.set(heading, { autoAlpha: 1 });
+              self.lines.forEach(function (line, i) {
+                tl.to(line, {
+                  y: "0%",
+                  duration: isDesktop ? 0.8 : 0.55,
+                  ease: "power3.out",
+                }, (isDesktop ? 0.3 : 0.2) + (i * (isDesktop ? 0.12 : 0.08)));
+              });
+            },
+          });
+        }
+
+        // Paragraph: mask-up with staggered children + scramble
+        if (paragraph) {
+          var paraChildren = Array.prototype.slice.call(paragraph.children);
+          paraChildren.forEach(function (child, index) {
+            var paraStart = isDesktop ? 0.9 : 0.6;
+            tl.to(child, {
+              yPercent: 0,
+              duration: isDesktop ? 0.7 : 0.45,
+              ease: "power3.out",
+            }, paraStart + (index * (isDesktop ? 0.12 : 0.08)));
+
+            if (child.hasAttribute("data-gsap-scramble")) {
+              var textTarget = child.querySelector("p, span, h1, h2, h3, h4, h5, h6") || child;
+              var finalText = textTarget.textContent;
+              var chars = child.getAttribute("data-gsap-scramble") || child.getAttribute("data-gsap-chars") || "upperCase";
+              if (chars === "") chars = "upperCase";
+              tl.to(textTarget, {
+                duration: isDesktop ? 2 : 1,
+                scrambleText: {
+                  text: finalText,
+                  chars: chars,
+                  revealDelay: 0.4,
+                  speed: 0.4,
+                },
+              }, paraStart + 0.05 + (index * (isDesktop ? 0.12 : 0.08)));
+            }
+          });
+        }
+
+        // ── Post-load: image parallax on scroll ──
+        if (image && isDesktop) {
+          ScrollTrigger.create({
+            trigger: section,
+            start: "top top",
+            end: "bottom top",
+            scrub: true,
+            onUpdate: function (self) {
+              gsap.set(image, { y: self.progress * 80 });
+            },
+          });
+        }
+      });
 
       // ── 1. Image Scale Reveal ──
       document.querySelectorAll('[data-gsap-scene="image-reveal"]').forEach(function (section) {
