@@ -1,0 +1,16 @@
+<!-- Moco AI — GSAP FOUC Prevention (paste in Site Settings > Custom Code > Head) -->
+<style>
+  [data-gsap="fade-load"],
+  [data-gsap="fade-up"],
+  [data-gsap="fade-up-scrub"],
+  [data-gsap="slide-right"],
+  [data-gsap="slide-left"],
+  [data-gsap="text-fade"],
+  [data-gsap="scramble"],
+  [data-gsap="hero-chars"],
+  [data-gsap="hero-lines"],
+  [data-gsap="hero-words"],
+  [data-gsap="stagger-up"] > * {
+    visibility: hidden;
+  }
+</style>
