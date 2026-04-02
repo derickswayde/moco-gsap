@@ -476,12 +476,23 @@ document.addEventListener("DOMContentLoaded", function () {
         if (paragraph) {
           gsap.set(paragraph, { autoAlpha: 0, y: isDesktop ? 30 : 15 });
         }
-        if (image) gsap.set(image, {
-          clipPath: "inset(0 100% 0 0)",
-          scale: isDesktop ? 1.08 : 1.04,
-          autoAlpha: 1,
-          transformOrigin: "center center",
-        });
+        // Save image natural dimensions before expanding to full-bleed
+        var imageNaturalWidth, imageNaturalLeft, imageNaturalRadius;
+        if (image) {
+          imageNaturalWidth = image.offsetWidth;
+          imageNaturalLeft = image.getBoundingClientRect().left;
+          imageNaturalRadius = getComputedStyle(image).borderRadius || "0px";
+
+          gsap.set(image, {
+            width: "100vw",
+            marginLeft: "calc(-50vw + 50%)",
+            borderRadius: "0px",
+            clipPath: "inset(0 100% 0 0)",
+            scale: isDesktop ? 1.05 : 1.02,
+            autoAlpha: 1,
+            transformOrigin: "center center",
+          });
+        }
         if (eyebrow) {
           gsap.set(eyebrow, { clipPath: "inset(0 0 0 0)", autoAlpha: 1 });
           gsap.set(eyebrow.children, { yPercent: 110, autoAlpha: 1 });
@@ -569,15 +580,20 @@ document.addEventListener("DOMContentLoaded", function () {
           }, paraStart);
         }
 
-        // ── Post-load: image parallax on scroll ──
-        if (image && isDesktop) {
-          ScrollTrigger.create({
-            trigger: section,
-            start: "top top",
-            end: "bottom top",
-            scrub: true,
-            onUpdate: function (self) {
-              gsap.set(image, { y: self.progress * 80 });
+        // ── Post-load: scroll-driven shrink from full-bleed to natural width ──
+        if (image) {
+          gsap.to(image, {
+            width: imageNaturalWidth,
+            marginLeft: 0,
+            borderRadius: imageNaturalRadius,
+            scale: 1,
+            ease: "none",
+            scrollTrigger: {
+              trigger: section,
+              start: "top top",
+              end: isDesktop ? "+=50%" : "+=35%",
+              scrub: 1,
+              invalidateOnRefresh: true,
             },
           });
         }
