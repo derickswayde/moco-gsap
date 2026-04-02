@@ -536,10 +536,12 @@ document.addEventListener("DOMContentLoaded", function () {
             autoSplit: true,
             onSplit: function (self) {
               // Add padding to mask wrappers to prevent descender clipping (p, y, g, etc.)
-              var maskWrappers = heading.querySelectorAll(".split-line-mask");
-              if (maskWrappers.length) {
-                gsap.set(maskWrappers, { paddingBottom: "0.15em" });
-              }
+              // Target parent of each line (the mask wrapper) rather than a class name
+              self.lines.forEach(function (line) {
+                if (line.parentElement && line.parentElement !== heading) {
+                  line.parentElement.style.paddingBottom = "0.2em";
+                }
+              });
               gsap.set(self.lines, { y: "100%" });
               gsap.set(heading, { autoAlpha: 1 });
               self.lines.forEach(function (line, i) {
