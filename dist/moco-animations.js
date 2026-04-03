@@ -770,8 +770,8 @@ document.addEventListener("DOMContentLoaded", function () {
             glow.style.background = "radial-gradient(" + glowSize + "px circle at " + glowPos.x + "px " + glowPos.y + "px, " + glowColor + ", transparent 40%)";
           }
 
-          var xTo = gsap.quickTo(glowPos, "x", { duration: 0.4, ease: "power3.out", onUpdate: renderGlow });
-          var yTo = gsap.quickTo(glowPos, "y", { duration: 0.4, ease: "power3.out", onUpdate: renderGlow });
+          var xTo = gsap.quickTo(glowPos, "x", { duration: 0.8, ease: "power3.out", onUpdate: renderGlow });
+          var yTo = gsap.quickTo(glowPos, "y", { duration: 0.8, ease: "power3.out", onUpdate: renderGlow });
 
           el.addEventListener("mousemove", function (e) {
             var rect = el.getBoundingClientRect();
