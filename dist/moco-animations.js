@@ -14,6 +14,7 @@
  *   "stagger-up"      — Stagger children upward on scroll (set on PARENT)
  *   "mask-up"         — Masked stagger reveal with optional scramble (set on PARENT)
  *   "scramble"        — Scramble text on scroll enter
+ *   "mask-lines"      — SplitText line-by-line mask reveal (scroll trigger)
  *   "hero-lines"      — SplitText line-by-line mask reveal (page load)
  *   "hero-chars"      — SplitText character stagger reveal (page load)
  *   "hero-words"      — SplitText word-by-word mask reveal (page load)
@@ -449,6 +450,38 @@ document.addEventListener("DOMContentLoaded", function () {
               stagger: customStagger || (isDesktop ? 0.15 : 0.08),
               ease: "circ.out",
               overwrite: true,
+            });
+          },
+        });
+      });
+
+      // ── Mask Lines (scroll-triggered line-by-line mask reveal) ──
+      document.querySelectorAll('[data-gsap="mask-lines"]').forEach(function (el) {
+        SplitText.create(el, {
+          type: "lines",
+          mask: "lines",
+          autoSplit: true,
+          onSplit: function (self) {
+            self.lines.forEach(function (line) {
+              if (line.parentElement && line.parentElement !== el) {
+                line.parentElement.style.paddingBottom = "0.2em";
+              }
+            });
+            gsap.set(self.lines, { y: "130%" });
+            gsap.set(el, { autoAlpha: 1 });
+
+            ScrollTrigger.create({
+              trigger: el,
+              start: isDesktop ? "top 85%" : "top 90%",
+              once: true,
+              onEnter: function () {
+                gsap.to(self.lines, {
+                  y: "0%",
+                  duration: isDesktop ? 0.8 : 0.55,
+                  stagger: isDesktop ? 0.12 : 0.08,
+                  ease: "power3.out",
+                });
+              },
             });
           },
         });
