@@ -757,7 +757,7 @@ document.addEventListener("DOMContentLoaded", function () {
           var pos = getComputedStyle(el).position;
           if (pos === "static") el.style.position = "relative";
 
-          var glowColor = el.getAttribute("data-gsap-glow-color") || "rgba(232, 189, 164, 0.1)";
+          var glowColor = el.getAttribute("data-gsap-glow-color") || "color-mix(in srgb, var(--_theme---card-data-heading) 40%, transparent)";
           var glowSize = el.getAttribute("data-gsap-glow-size") || "600";
 
           var glowPos = { x: 0, y: 0 };
