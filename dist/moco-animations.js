@@ -757,7 +757,7 @@ document.addEventListener("DOMContentLoaded", function () {
           var pos = getComputedStyle(el).position;
           if (pos === "static") el.style.position = "relative";
 
-          var glowColor = el.getAttribute("data-gsap-glow-color") || "color-mix(in srgb, var(--_theme---card-data-heading) 40%, transparent)";
+          var glowColor = el.getAttribute("data-gsap-glow-color") || "color-mix(in srgb, var(--_theme---card-data-heading) 20%, transparent)";
           var glowSize = el.getAttribute("data-gsap-glow-size") || "600";
 
           var glowPos = { x: 0, y: 0 };
@@ -767,7 +767,7 @@ document.addEventListener("DOMContentLoaded", function () {
           el.insertBefore(glow, el.firstChild);
 
           function renderGlow() {
-            glow.style.background = "radial-gradient(" + glowSize + "px circle at " + glowPos.x + "px " + glowPos.y + "px, " + glowColor + ", transparent 40%)";
+            glow.style.background = "radial-gradient(" + glowSize + "px circle at " + glowPos.x + "px " + glowPos.y + "px, " + glowColor + " 0%, " + glowColor + " 10%, transparent 70%)";
           }
 
           var xTo = gsap.quickTo(glowPos, "x", { duration: 1.6, ease: "power3.out", onUpdate: renderGlow });
