@@ -476,7 +476,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (paragraph) {
           gsap.set(paragraph, { autoAlpha: 0, y: isDesktop ? 30 : 15 });
         }
-        // Image starts at natural grid size, wipes in, then grows to full-bleed on scroll
+        // Image wipes in via clip-path from left to right
         if (image) {
           gsap.set(image, {
             clipPath: "inset(0 100% 0 0)",
@@ -567,22 +567,6 @@ document.addEventListener("DOMContentLoaded", function () {
           }, paraStart);
         }
 
-        // ── Post-load: scroll-driven grow from grid size to full viewport width ──
-        if (image) {
-          var imageOffsetX = -image.getBoundingClientRect().left;
-          gsap.to(image, {
-            width: window.innerWidth,
-            x: imageOffsetX,
-            ease: "none",
-            scrollTrigger: {
-              trigger: section,
-              start: "top top",
-              end: isDesktop ? "+=50%" : "+=35%",
-              scrub: 1,
-              invalidateOnRefresh: true,
-            },
-          });
-        }
       });
 
       // ── 1. Image Scale Reveal ──
