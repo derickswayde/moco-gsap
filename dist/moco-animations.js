@@ -760,15 +760,23 @@ document.addEventListener("DOMContentLoaded", function () {
           var glowColor = el.getAttribute("data-gsap-glow-color") || "rgba(232, 189, 164, 0.1)";
           var glowSize = el.getAttribute("data-gsap-glow-size") || "600";
 
+          var glowPos = { x: 0, y: 0 };
+
           var glow = document.createElement("div");
           glow.style.cssText = "position:absolute;inset:0;pointer-events:none;opacity:0;border-radius:inherit;overflow:hidden;z-index:1;";
           el.insertBefore(glow, el.firstChild);
 
+          function renderGlow() {
+            glow.style.background = "radial-gradient(" + glowSize + "px circle at " + glowPos.x + "px " + glowPos.y + "px, " + glowColor + ", transparent 40%)";
+          }
+
+          var xTo = gsap.quickTo(glowPos, "x", { duration: 0.4, ease: "power3.out", onUpdate: renderGlow });
+          var yTo = gsap.quickTo(glowPos, "y", { duration: 0.4, ease: "power3.out", onUpdate: renderGlow });
+
           el.addEventListener("mousemove", function (e) {
             var rect = el.getBoundingClientRect();
-            var x = e.clientX - rect.left;
-            var y = e.clientY - rect.top;
-            glow.style.background = "radial-gradient(" + glowSize + "px circle at " + x + "px " + y + "px, " + glowColor + ", transparent 40%)";
+            xTo(e.clientX - rect.left);
+            yTo(e.clientY - rect.top);
           });
 
           el.addEventListener("mouseenter", function () {
