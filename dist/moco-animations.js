@@ -462,7 +462,7 @@ document.addEventListener("DOMContentLoaded", function () {
           .trim();
 
         if (navBg) {
-          gsap.set(navContain, { backgroundColor: "rgba(0,0,0,0)" });
+          gsap.set(navContain, { backgroundColor: "rgba(255,255,255,0)" });
 
           gsap.to(navContain, {
             backgroundColor: navBg,
