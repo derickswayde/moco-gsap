@@ -453,6 +453,30 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       });
 
+      // ── Nav Background Fade ──
+      // Transparent at top, fades to --_theme---nav--background on scroll.
+      var navContain = document.querySelector(".nav_desktop_contain");
+      if (navContain) {
+        var navBg = getComputedStyle(document.documentElement)
+          .getPropertyValue("--_theme---nav--background")
+          .trim();
+
+        if (navBg) {
+          gsap.set(navContain, { backgroundColor: "rgba(0,0,0,0)" });
+
+          gsap.to(navContain, {
+            backgroundColor: navBg,
+            ease: "none",
+            scrollTrigger: {
+              trigger: document.documentElement,
+              start: "top -1",
+              end: "top -80",
+              scrub: true,
+            },
+          });
+        }
+      }
+
       // ════════════════════════════════════════════
       //  SCENES
       // ════════════════════════════════════════════
