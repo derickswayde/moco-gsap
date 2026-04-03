@@ -581,6 +581,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Paragraph: simple fade in with slight rise
         if (paragraph) {
+          gsap.set(paragraph.children, { visibility: "inherit" });
           gsap.set(paragraph, { autoAlpha: 0, y: isDesktop ? 30 : 15 });
           var paraStart = isDesktop ? 0.9 : 0.6;
           tl.to(paragraph, {
