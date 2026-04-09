@@ -851,7 +851,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         ScrollTrigger.create({
           trigger: grid,
-          start: isDesktop ? "top 80%" : "top 90%",
+          start: isDesktop ? "top 65%" : "top 80%",
           once: true,
           onEnter: function () {
             gsap.to(cards, {
