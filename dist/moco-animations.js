@@ -859,7 +859,7 @@ document.addEventListener("DOMContentLoaded", function () {
               y: 0,
               scale: 1,
               clipPath: "inset(0% 0% 0% 0%)",
-              duration: isDesktop ? 0.9 : 0.5,
+              duration: isDesktop ? 1.2 : 0.7,
               stagger: stagger,
               ease: "power3.out",
               overwrite: true,
