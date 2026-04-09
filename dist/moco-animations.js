@@ -29,6 +29,7 @@
  *   "magnetic"        — Magnetic hover effect (desktop only)
  *   "glow-track"      — Mouse-following radial glow (desktop only, container > 50em)
  *   "flip-grid"       — Animated filter grid
+ *   "stagger-cards"   — Clip-path card stagger on scroll (set on grid parent)
  *
  * ── MODIFIERS ──────────────────────────────────────
  *   data-gsap-stagger="0.15"      — Custom stagger (stagger-up)
@@ -822,7 +823,52 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       }
 
-      // ── 8. Flip Grid Filter ──
+      // ── 8. Stagger Cards ──
+      // Premium card entrance — clip-path curtain wipe from bottom, combined with
+      // rise and subtle scale. Set on the grid/parent element; all direct children
+      // animate in sequence.
+      //   <div data-gsap-scene="stagger-cards" class="u-grid">
+      //     <div class="card">...</div>
+      //   </div>
+      // Optional: data-gsap-stagger="0.15" to override stagger interval.
+      document.querySelectorAll('[data-gsap-scene="stagger-cards"]').forEach(function (grid) {
+        var cards = grid.children;
+        if (!cards.length) return;
+
+        if (reduceMotion) {
+          gsap.set(cards, { autoAlpha: 1, clipPath: "none" });
+          return;
+        }
+
+        var stagger = parseFloat(grid.getAttribute("data-gsap-stagger") || (isDesktop ? "0.12" : "0.08"));
+
+        gsap.set(cards, {
+          autoAlpha: 0,
+          y: isDesktop ? 60 : 25,
+          scale: isDesktop ? 0.96 : 1,
+          clipPath: "inset(30% 0% 0% 0%)",
+        });
+
+        ScrollTrigger.create({
+          trigger: grid,
+          start: isDesktop ? "top 80%" : "top 90%",
+          once: true,
+          onEnter: function () {
+            gsap.to(cards, {
+              autoAlpha: 1,
+              y: 0,
+              scale: 1,
+              clipPath: "inset(0% 0% 0% 0%)",
+              duration: isDesktop ? 0.9 : 0.5,
+              stagger: stagger,
+              ease: "power3.out",
+              overwrite: true,
+            });
+          },
+        });
+      });
+
+      // ── 9. Flip Grid Filter ──
       document.querySelectorAll('[data-gsap-scene="flip-grid"]').forEach(function (scene) {
         var filters = scene.querySelectorAll('[data-gsap-role="filter"]');
         var items = scene.querySelectorAll('[data-gsap-role="grid-item"]');
