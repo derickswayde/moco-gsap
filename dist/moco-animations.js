@@ -779,14 +779,14 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       }
 
-      // ── 7. Glow Track ──
+      // ── 7. Glow Track ── DISABLED
       // Mouse-following radial gradient spotlight inside each card. Desktop only,
       // grid container > 50em. Each direct child of the scene gets its own glow
       // layer clipped to the card's bounds — blob never overflows the cards.
       // Set data-gsap-scene="glow-track" on the grid wrapper.
       // Optional: data-gsap-glow-color="rgba(232,189,164,0.1)" to customise the glow colour.
       // Optional: data-gsap-glow-size="600" to customise the glow radius in px.
-      if (isDesktop && !reduceMotion) {
+      if (false && isDesktop && !reduceMotion) {
         document.querySelectorAll('[data-gsap-scene~="glow-track"]').forEach(function (el) {
           if (el.offsetWidth < 800) return;
 
