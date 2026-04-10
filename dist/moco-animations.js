@@ -780,7 +780,9 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       // ── 7. Glow Track ──
-      // Mouse-following radial gradient spotlight. Desktop only, container > 50em.
+      // Mouse-following radial gradient spotlight inside each card. Desktop only,
+      // grid container > 50em. Each direct child of the scene gets its own glow
+      // layer clipped to the card's bounds — blob never overflows the cards.
       // Set data-gsap-scene="glow-track" on the grid wrapper.
       // Optional: data-gsap-glow-color="rgba(232,189,164,0.1)" to customise the glow colour.
       // Optional: data-gsap-glow-size="600" to customise the glow radius in px.
@@ -788,37 +790,57 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll('[data-gsap-scene~="glow-track"]').forEach(function (el) {
           if (el.offsetWidth < 800) return;
 
-          var pos = getComputedStyle(el).position;
-          if (pos === "static") el.style.position = "relative";
-
           var glowColor = el.getAttribute("data-gsap-glow-color") || "color-mix(in srgb, var(--_theme---card-data-heading) 10%, transparent)";
           var glowSize = el.getAttribute("data-gsap-glow-size") || "600";
 
-          var glowPos = { x: 0, y: 0 };
-
-          var glow = document.createElement("div");
-          glow.style.cssText = "position:absolute;inset:0;pointer-events:none;opacity:0;border-radius:inherit;overflow:hidden;z-index:1;";
-          el.insertBefore(glow, el.firstChild);
-
-          function renderGlow() {
-            glow.style.background = "radial-gradient(" + glowSize + "px circle at " + glowPos.x + "px " + glowPos.y + "px, " + glowColor + " 0%, " + glowColor + " 10%, transparent 70%)";
+          // Collect direct children (cards), skipping any previously-injected layer
+          var cards = [];
+          for (var i = 0; i < el.children.length; i++) {
+            var child = el.children[i];
+            if (!child.hasAttribute("data-gsap-glow-layer")) cards.push(child);
           }
+          if (!cards.length) return;
 
-          var xTo = gsap.quickTo(glowPos, "x", { duration: 1.6, ease: "power3.out", onUpdate: renderGlow });
-          var yTo = gsap.quickTo(glowPos, "y", { duration: 1.6, ease: "power3.out", onUpdate: renderGlow });
+          // Inject a clipped glow layer into each card
+          var glows = cards.map(function (card) {
+            if (getComputedStyle(card).position === "static") card.style.position = "relative";
+            if (getComputedStyle(card).overflow === "visible") card.style.overflow = "hidden";
+
+            var glow = document.createElement("div");
+            glow.setAttribute("data-gsap-glow-layer", "");
+            glow.style.cssText = "position:absolute;inset:0;pointer-events:none;opacity:0;border-radius:inherit;z-index:0;";
+            card.insertBefore(glow, card.firstChild);
+
+            var pos = { x: 0, y: 0 };
+            function render() {
+              glow.style.background = "radial-gradient(" + glowSize + "px circle at " + pos.x + "px " + pos.y + "px, " + glowColor + " 0%, " + glowColor + " 10%, transparent 70%)";
+            }
+            return {
+              card: card,
+              glow: glow,
+              xTo: gsap.quickTo(pos, "x", { duration: 1.6, ease: "power3.out", onUpdate: render }),
+              yTo: gsap.quickTo(pos, "y", { duration: 1.6, ease: "power3.out", onUpdate: render }),
+            };
+          });
 
           el.addEventListener("mousemove", function (e) {
-            var rect = el.getBoundingClientRect();
-            xTo(e.clientX - rect.left);
-            yTo(e.clientY - rect.top);
+            glows.forEach(function (g) {
+              var rect = g.card.getBoundingClientRect();
+              g.xTo(e.clientX - rect.left);
+              g.yTo(e.clientY - rect.top);
+            });
           });
 
           el.addEventListener("mouseenter", function () {
-            gsap.to(glow, { opacity: 1, duration: 0.3, ease: "power2.out" });
+            glows.forEach(function (g) {
+              gsap.to(g.glow, { opacity: 1, duration: 0.3, ease: "power2.out" });
+            });
           });
 
           el.addEventListener("mouseleave", function () {
-            gsap.to(glow, { opacity: 0, duration: 0.5, ease: "power2.out" });
+            glows.forEach(function (g) {
+              gsap.to(g.glow, { opacity: 0, duration: 0.5, ease: "power2.out" });
+            });
           });
         });
       }
