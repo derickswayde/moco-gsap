@@ -785,7 +785,7 @@ document.addEventListener("DOMContentLoaded", function () {
       // Optional: data-gsap-glow-color="rgba(232,189,164,0.1)" to customise the glow colour.
       // Optional: data-gsap-glow-size="600" to customise the glow radius in px.
       if (isDesktop && !reduceMotion) {
-        document.querySelectorAll('[data-gsap-scene="glow-track"]').forEach(function (el) {
+        document.querySelectorAll('[data-gsap-scene~="glow-track"]').forEach(function (el) {
           if (el.offsetWidth < 800) return;
 
           var pos = getComputedStyle(el).position;
@@ -831,7 +831,7 @@ document.addEventListener("DOMContentLoaded", function () {
       //     <div class="card">...</div>
       //   </div>
       // Optional: data-gsap-stagger="0.15" to override stagger interval.
-      document.querySelectorAll('[data-gsap-scene="stagger-cards"]').forEach(function (grid) {
+      document.querySelectorAll('[data-gsap-scene~="stagger-cards"]').forEach(function (grid) {
         var cards = grid.children;
         if (!cards.length) return;
 
