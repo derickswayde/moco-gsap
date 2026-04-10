@@ -804,11 +804,12 @@ document.addEventListener("DOMContentLoaded", function () {
           // Inject a clipped glow layer into each card
           var glows = cards.map(function (card) {
             if (getComputedStyle(card).position === "static") card.style.position = "relative";
-            if (getComputedStyle(card).overflow === "visible") card.style.overflow = "hidden";
+            card.style.overflow = "hidden";
+            card.style.isolation = "isolate";
 
             var glow = document.createElement("div");
             glow.setAttribute("data-gsap-glow-layer", "");
-            glow.style.cssText = "position:absolute;inset:0;pointer-events:none;opacity:0;border-radius:inherit;z-index:0;";
+            glow.style.cssText = "position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;opacity:0;border-radius:inherit;z-index:0;";
             card.insertBefore(glow, card.firstChild);
 
             var pos = { x: 0, y: 0 };
